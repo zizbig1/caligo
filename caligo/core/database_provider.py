@@ -1,4 +1,7 @@
+import sys
 from typing import TYPE_CHECKING, Any
+
+import certifi
 
 from .base import Base
 from .. import util
@@ -15,7 +18,11 @@ class DatabaseProvider(Base):
         if not uri:
             raise RuntimeError("DB_URI must be set before running the bot")
 
-        client = util.db.AsyncClient(uri, connect=False)
+        if sys.platform == "win32":
+            ca = certifi.where()
+            client = util.db.AsyncClient(uri, tlsCAFile=ca)
+        else:
+            client = util.db.AsyncClient(uri, connect=False)
         self.db = client.get_database("caligo")
 
         super().__init__(**kwargs)
