@@ -27,62 +27,6 @@ class SystemModule(module.Module):
 
         self.db = self.bot.db.get_collection("system")
 
-    @command.desc("Get how long this bot has been up for")
-    async def cmd_uptime(self, ctx: command.Context) -> None:
-        delta_us = util.time.usec() - self.bot.start_time_us
-        await ctx.respond(f"Uptime: {util.time.format_duration_us(delta_us)}")
-
-    @command.desc("Get information about the host system")
-    @command.alias("si")
-    async def cmd_sysinfo(self, ctx: command.Context) -> str:
-        await ctx.respond("Collecting system information...")
-
-        try:
-            stdout, _, ret = await util.system.run_command(
-                "neofetch", "--stdout", timeout=60
-            )
-        except asyncio.TimeoutError:
-            return "🕑 `neofetch` failed to finish within 1 minute."
-        except FileNotFoundError:
-            return (
-                "❌ [neofetch](https://github.com/dylanaraps/neofetch) "
-                "must be installed on the host system."
-            )
-
-        err = f"⚠️ Return code: {ret}" if ret != 0 else ""
-        sysinfo = "\n".join(stdout.split("\n")[2:]) if ret == 0 else stdout
-        return f"```{sysinfo}```{err}"
-
-    @command.desc("Test Internet speed")
-    @command.alias("stest", "st")
-    async def cmd_speedtest(self, ctx: command.Context) -> str:
-        before = util.time.usec()
-
-        st = await util.run_sync(speedtest.Speedtest)
-        status = "Selecting server..."
-
-        await ctx.respond(status)
-        server = await util.run_sync(st.get_best_server)
-        status += f" {server['sponsor']} ({server['name']})\n"
-        status += f"Ping: {server['latency']:.2f} ms\n"
-
-        status += "Performing download test..."
-        await ctx.respond(status)
-        dl_bits = await util.run_sync(st.download)
-        dl_mbit = dl_bits / 1000 / 1000
-        status += f" {dl_mbit:.2f} Mbps\n"
-
-        status += "Performing upload test..."
-        await ctx.respond(status)
-        ul_bits = await util.run_sync(st.upload)
-        ul_mbit = ul_bits / 1000 / 1000
-        status += f" {ul_mbit:.2f} Mbps\n"
-
-        delta = util.time.usec() - before
-        status += f"\nTime elapsed: {util.time.format_duration_us(delta)}"
-
-        return status
-
     @command.desc("Run a snippet in a shell")
     @command.usage("[shell snippet]")
     @command.alias("sh")

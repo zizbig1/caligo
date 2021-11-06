@@ -21,6 +21,7 @@ class TelegramConfig(MutableMapping[_KT, _VT]):
             "bot_token": os.environ.get("BOT_TOKEN"),
             "container": os.environ.get("CONTAINER") == "True",
             "db_uri": os.environ.get("DB_URI"),
+            "db_uri_anjani": os.environ.get("DB_URI_ANJANI"),
             "download_path": os.environ.get("DOWNLOAD_PATH"),
             "gdrive_folder_id": os.environ.get("G_DRIVE_FOLDER_ID"),
             "gdrive_index_link": os.environ.get("G_DRIVE_INDEX_LINK"),
@@ -30,6 +31,8 @@ class TelegramConfig(MutableMapping[_KT, _VT]):
             "heroku_api_key": os.environ.get("HEROKU_API_KEY"),
             "heroku_app_name": os.environ.get("HEROKU_APP"),
             "mirror_enabled": os.environ.get("MIRROR_MODULE") == "enable",
+            "sp_token": os.environ.get("SP_TOKEN"),
+            "sp_url": os.environ.get("SP_URL"),
             "string_session": os.environ.get("STRING_SESSION"),
         }
 
